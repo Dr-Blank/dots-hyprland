@@ -13,9 +13,8 @@ local qsIsAlive = qsIpcCall .. " TEST_ALIVE"
 -- was pressed while Super was held; scrolling doesn't count, so track that here
 local superTapOnly = false
 local function toggleSearchOnSuperRelease()
-    if superTapOnly then
-        hl.exec_cmd(qsIpcCall .. " search toggle || pkill fuzzel || fuzzel")
-    end
+    if not superTapOnly then return end
+    hl.exec_cmd(qsIpcCall .. " search toggle || pkill fuzzel || fuzzel")
 end
 hl.bind("SUPER + SUPER_L", function() superTapOnly = true end)
 hl.bind("SUPER + SUPER_R", function() superTapOnly = true end)
