@@ -9,10 +9,20 @@ local hyprScripts = "$HOME/.config/hypr/hyprland/scripts"
 local qsIpcCall = "qs -c $qsConfig ipc call"
 local qsIsAlive = qsIpcCall .. " TEST_ALIVE"
 
-hl.bind("SUPER + SUPER_L", hl.dsp.global("quickshell:searchToggleRelease"), { description = "Shell: Toggle search" })
-hl.bind("SUPER + SUPER_R", hl.dsp.global("quickshell:searchToggleRelease"))
-hl.bind("SUPER + SUPER_L", hl.dsp.exec_cmd(qsIsAlive .. " || pkill fuzzel || fuzzel"))
-hl.bind("SUPER + SUPER_R", hl.dsp.exec_cmd(qsIsAlive .. " || pkill fuzzel || fuzzel"))
+-- Toggle search on a lone Super tap. Release binds are skipped by Hyprland if another key
+-- was pressed while Super was held; scrolling doesn't count, so track that here
+local superTapOnly = false
+local function toggleSearchOnSuperRelease()
+    if superTapOnly then
+        hl.exec_cmd(qsIpcCall .. " search toggle || pkill fuzzel || fuzzel")
+    end
+end
+hl.bind("SUPER + SUPER_L", function() superTapOnly = true end)
+hl.bind("SUPER + SUPER_R", function() superTapOnly = true end)
+hl.bind("SUPER + SUPER_L", toggleSearchOnSuperRelease, { release = true, description = "Shell: Toggle search" })
+hl.bind("SUPER + SUPER_R", toggleSearchOnSuperRelease, { release = true })
+hl.bind("mouse_up", function() superTapOnly = false end, { ignore_mods = true, non_consuming = true })
+hl.bind("mouse_down", function() superTapOnly = false end, { ignore_mods = true, non_consuming = true })
 
 hl.bind("SUPER_L", hl.dsp.global("quickshell:workspaceNumber"), { ignore_mods = true, transparent = true })
 hl.bind("SUPER_R", hl.dsp.global("quickshell:workspaceNumber"), { ignore_mods = true, transparent = true })
